@@ -104,3 +104,6 @@ CLAUDE.local.md
 .pnpm-store/*
 local/
 Procfile.worktree
+
+# Local development services
+.dev_services/

@@ -164,9 +164,6 @@ GEM
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
-    barnes (0.0.9)
-      multi_json (~> 1)
-      statsd-ruby (~> 1.1)
     base64 (0.3.0)
     bcrypt (3.1.22)
     benchmark (0.4.1)
@@ -337,6 +334,7 @@ GEM
       googleauth (~> 1)
     ffi (1.17.2)
     ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x64-mingw-ucrt)
     ffi (1.17.2-x86_64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
@@ -423,13 +421,15 @@ GEM
     grpc (1.72.0-arm64-darwin)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
+    grpc (1.72.0-x64-mingw-ucrt)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
     grpc (1.72.0-x86_64-darwin)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
     grpc (1.72.0-x86_64-linux)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
-    gserver (0.0.1)
     haikunator (1.1.1)
     hairtrigger (1.0.0)
       activerecord (>= 6.0, < 8)
@@ -461,7 +461,7 @@ GEM
     image_processing (1.12.2)
       mini_magick (>= 4.9.5, < 5)
       ruby-vips (>= 2.0.17, < 3)
-    io-console (0.6.0)
+    io-console (0.8.1)
     irb (1.7.2)
       reline (>= 0.3.6)
     iso-639 (0.3.8)
@@ -603,6 +603,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.4-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.19.4-x64-mingw-ucrt)
+      racc (~> 1.4)
     nokogiri (1.19.4-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.4-x86_64-linux-gnu)
@@ -652,7 +654,7 @@ GEM
     opensearch-ruby (3.4.0)
       faraday (>= 1.0, < 3)
       multi_json (>= 1.0)
-    openssl (3.2.0)
+    openssl (3.3.1)
     opentelemetry-api (1.7.0)
     opentelemetry-common (0.23.0)
       opentelemetry-api (~> 1.0)
@@ -922,9 +924,6 @@ GEM
       fugit (~> 1.8, >= 1.11.1)
       globalid (>= 1.0.1)
       sidekiq (>= 6.5.0)
-    sidekiq_alive (2.5.0)
-      gserver (~> 0.0.1)
-      sidekiq (>= 5, < 9)
     signet (0.17.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -963,8 +962,6 @@ GEM
       sprockets (>= 3.0.0)
     squasher (0.7.2)
     ssrf_filter (1.5.0)
-    stackprof (0.2.25)
-    statsd-ruby (1.5.0)
     stripe (18.0.1)
     telephone_number (1.4.20)
     test-prof (1.2.1)
@@ -1045,6 +1042,7 @@ PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
   ruby
+  x64-mingw-ucrt
   x86_64-darwin-18
   x86_64-darwin-20
   x86_64-darwin-21
@@ -1065,7 +1063,6 @@ DEPENDENCIES
   aws-actionmailbox-ses (~> 0)
   aws-sdk-s3
   azure-storage-blob!
-  barnes
   bootsnap
   brakeman
   browser
@@ -1177,7 +1174,6 @@ DEPENDENCIES
   shoulda-matchers
   sidekiq (~> 7.3, >= 7.3.1)
   sidekiq-cron (>= 2.4.0)
-  sidekiq_alive
   simplecov (>= 0.21)
   simplecov_json_formatter
   skooma
@@ -1186,7 +1182,6 @@ DEPENDENCIES
   spring-watcher-listen
   squasher
   ssrf_filter (~> 1.5)
-  stackprof
   stripe (~> 18.0)
   telephone_number
   test-prof
@@ -1205,7 +1200,7 @@ DEPENDENCIES
   working_hours
 
 RUBY VERSION
-   ruby 3.4.4p34
+   ruby 3.4.9p82
 
 BUNDLED WITH
    2.5.16

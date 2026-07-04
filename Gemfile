@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '3.4.4'
+ruby '3.4.9'
 
 ##-- base gems for rails --##
 gem 'rack-cors', '2.0.0', require: 'rack/cors'
@@ -79,7 +79,7 @@ gem 'foreman'
 gem 'puma', '~> 7.2', '>= 7.2.1'
 gem 'vite_rails'
 # metrics on heroku
-gem 'barnes'
+gem 'barnes' unless Gem.win_platform?
 
 ##--- gems for authentication & authorization ---##
 gem 'devise', '>= 4.9.4'
@@ -137,7 +137,7 @@ gem 'sidekiq', '~> 7.3', '>= 7.3.1'
 # We want cron jobs
 gem 'sidekiq-cron', '>= 2.4.0'
 # for sidekiq healthcheck
-gem 'sidekiq_alive'
+gem 'sidekiq_alive' unless Gem.win_platform?
 
 ##-- Push notification service --##
 gem 'fcm'
@@ -234,7 +234,7 @@ group :development do
 
   # profiling
   gem 'rack-mini-profiler', '>= 3.2.0', require: false
-  gem 'stackprof'
+  gem 'stackprof' unless Gem.win_platform?
   # Should install the associated chrome extension to view query logs
   gem 'meta_request', '>= 0.8.3'
 
