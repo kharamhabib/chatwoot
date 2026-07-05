@@ -23,13 +23,22 @@ services:
       - NODE_ENV=production
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
+      - DEFAULT_LOCALE=pt_BR
+      - INTERNAL_HOST_URL=http://rails:3000
       - POSTGRES_HOST=postgres
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-1556b5a7f48b5a440e1f7816133fbac70143289208c95cb4f90207aa48ee0555336d0a3cf6b78dd54833b3ab5517b91b9d5482473538651d32eea2669b3525b5}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-default_redis_password}@redis:6379
     entrypoint: docker/entrypoints/rails.sh
     command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
+    post_start:
+      - command: "bundle exec rails db:prepare"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- --header='Accept: text/html' http://127.0.0.1:3000/ || exit 1"]
+      interval: 60s
+      timeout: 20s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -46,12 +55,19 @@ services:
       - NODE_ENV=production
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
+      - DEFAULT_LOCALE=pt_BR
+      - INTERNAL_HOST_URL=http://rails:3000
       - POSTGRES_HOST=postgres
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-1556b5a7f48b5a440e1f7816133fbac70143289208c95cb4f90207aa48ee0555336d0a3cf6b78dd54833b3ab5517b91b9d5482473538651d32eea2669b3525b5}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-default_redis_password}@redis:6379
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep [s]idekiq || exit 1"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -79,12 +95,12 @@ services:
   redis:
     image: redis:alpine
     restart: always
-    command: ["sh", "-c", "redis-server --requirepass \"$REDIS_PASSWORD\""]
+    command: ["sh", "-c", "redis-server --requirepass \"${REDIS_PASSWORD:-default_redis_password}\""]
     env_file: .env
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$REDIS_PASSWORD\" ping || redis-cli ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"${REDIS_PASSWORD:-default_redis_password}\" ping"]
       interval: 5s
       timeout: 5s
       retries: 5
