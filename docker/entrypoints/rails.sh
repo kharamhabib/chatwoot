@@ -30,5 +30,11 @@ do
   sleep 2;
 done
 
+# Execute migrations if starting the rails server
+if [ "$1" = "bundle" ] && [ "$2" = "exec" ] && [ "$3" = "rails" ] && [ "$4" = "s" ]; then
+  echo "Running database prepare..."
+  bundle exec rails db:prepare
+fi
+
 # Execute the main process of the container
 exec "$@"
