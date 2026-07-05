@@ -82,7 +82,7 @@ RUN mkdir -p /app/log
 
 # generate production assets if production environment
 RUN if [ "$RAILS_ENV" = "production" ]; then \
-  SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=enabled bundle exec rake assets:precompile > /tmp/precompile.log 2>&1 || (tail -n 100 /tmp/precompile.log && exit 1) \
+  SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=enabled bundle exec rake assets:precompile > /tmp/precompile.log 2>&1 || (ERR=$(head -n 1 /tmp/precompile.log | tr -cd 'a-zA-Z0-9_ :.-' | cut -c 1-100); "ERROR_IS___$ERR" && exit 1) \
   && rm -rf spec node_modules tmp/cache; \
   fi
 
