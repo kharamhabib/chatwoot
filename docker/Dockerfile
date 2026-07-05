@@ -82,7 +82,7 @@ RUN mkdir -p /app/log
 
 # generate production assets if production environment
 RUN if [ "$RAILS_ENV" = "production" ]; then \
-  SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=enabled bundle exec rake assets:precompile > /tmp/precompile.log 2>&1 || (ERR=$(cat /tmp/precompile.log | tr '\n' ' ' | tr '\r' ' ' | tr -cd 'a-zA-Z0-9_ :.-' | tr ' ' '_' | cut -c 1-200); "ERROR_IS___${ERR:-LOG_IS_EMPTY_OR_OOM_KILLED}" && exit 1) \
+  SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=enabled bundle exec rake assets:precompile \
   && rm -rf spec node_modules tmp/cache; \
   fi
 
