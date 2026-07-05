@@ -1,17 +1,15 @@
 version: '3.8'
 
-services:
-  base: &base
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-    env_file: .env
-    volumes:
-      - storage_data:/app/storage
-    restart: always
-    profiles:
-      - build-only
+x-base: &base
+  build:
+    context: .
+    dockerfile: ./docker/Dockerfile
+  env_file: .env
+  volumes:
+    - storage_data:/app/storage
+  restart: always
 
+services:
   rails:
     <<: *base
     depends_on:
