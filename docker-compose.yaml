@@ -28,6 +28,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-chatwoot}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-1556b5a7f48b5a440e1f7816133fbac70143289208c95cb4f90207aa48ee0555336d0a3cf6b78dd54833b3ab5517b91b9d5482473538651d32eea2669b3525b5}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-default_redis_password}@redis:6379
     entrypoint: docker/entrypoints/rails.sh
@@ -60,6 +61,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-chatwoot}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-1556b5a7f48b5a440e1f7816133fbac70143289208c95cb4f90207aa48ee0555336d0a3cf6b78dd54833b3ab5517b91b9d5482473538651d32eea2669b3525b5}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-default_redis_password}@redis:6379
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
