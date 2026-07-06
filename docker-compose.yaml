@@ -6,7 +6,7 @@ x-base: &base
     dockerfile: ./docker/Dockerfile
   env_file: .env
   volumes:
-    - storage_data:/app/storage
+    - storage:/app/storage
   restart: always
 
 services:
@@ -23,20 +23,28 @@ services:
       - NODE_ENV=production
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
-      - FORCE_SSL=true
-      - FRONTEND_URL=${SERVICE_FQDN_RAILS:-http://localhost:3000}
+      - FORCE_SSL=${FORCE_SSL:-true}
       - DEFAULT_LOCALE=pt_BR
+      - FRONTEND_URL=${SERVICE_FQDN_RAILS:-${SERVICE_URL_RAILS:-http://localhost:3000}}
       - INTERNAL_HOST_URL=http://rails:3000
       - POSTGRES_HOST=postgres
-      - POSTGRES_USERNAME=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-chatwoot}
-      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-1556b5a7f48b5a440e1f7816133fbac70143289208c95cb4f90207aa48ee0555336d0a3cf6b78dd54833b3ab5517b91b9d5482473538651d32eea2669b3525b5}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-default_redis_password}@redis:6379
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot_production}
+      - SECRET_KEY_BASE=${SERVICE_PASSWORD_64_SECRETKEYBASE}
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD=${SERVICE_PASSWORD_REDIS}
+      - MAILER_SENDER_EMAIL=${MAILER_SENDER_EMAIL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - CHATWOOT_HUB_URL=https://chatwoot.rockconect.cloud/#
     entrypoint: docker/entrypoints/rails.sh
     command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
     post_start:
-      - command: "bundle exec rails db:prepare"
+      - command: >
+          sh -c 'bundle exec rails db:chatwoot_prepare &&
+          (bundle exec rails branding:update || true) &&
+          (if [ -n "$${BRAND_ASSETS_URL}" ] && [ -f deployment/extract_brand_assets.sh ]; then deployment/extract_brand_assets.sh "$${BRAND_ASSETS_URL}"; fi)'
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- --header='Accept: text/html' --header='X-Forwarded-Proto: https' http://127.0.0.1:3000/ || exit 1"]
       interval: 60s
@@ -58,16 +66,21 @@ services:
       - NODE_ENV=production
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
-      - FORCE_SSL=true
-      - FRONTEND_URL=${SERVICE_FQDN_RAILS:-http://localhost:3000}
+      - FORCE_SSL=${FORCE_SSL:-true}
       - DEFAULT_LOCALE=pt_BR
+      - FRONTEND_URL=${SERVICE_FQDN_RAILS:-${SERVICE_URL_RAILS:-http://localhost:3000}}
       - INTERNAL_HOST_URL=http://rails:3000
       - POSTGRES_HOST=postgres
-      - POSTGRES_USERNAME=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-chatwoot}
-      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-1556b5a7f48b5a440e1f7816133fbac70143289208c95cb4f90207aa48ee0555336d0a3cf6b78dd54833b3ab5517b91b9d5482473538651d32eea2669b3525b5}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-default_redis_password}@redis:6379
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot_production}
+      - SECRET_KEY_BASE=${SERVICE_PASSWORD_64_SECRETKEYBASE}
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD=${SERVICE_PASSWORD_REDIS}
+      - MAILER_SENDER_EMAIL=${MAILER_SENDER_EMAIL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - CHATWOOT_HUB_URL=https://chatwoot.rockconect.cloud/#
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
     healthcheck:
       test: ["CMD-SHELL", "ps aux | grep [s]idekiq || exit 1"]
@@ -80,19 +93,20 @@ services:
           memory: 512M
 
   postgres:
-    image: pgvector/pgvector:pg16
+    image: ghcr.io/fazer-ai/postgres-16-pgvector:latest
     restart: always
-    environment:
-      - POSTGRES_DB=chatwoot
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-chatwoot_production}
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - CHATWOOT_HUB_URL=https://chatwoot.rockconect.cloud/#
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d chatwoot"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -101,21 +115,22 @@ services:
   redis:
     image: redis:alpine
     restart: always
-    command: ["sh", "-c", "redis-server --requirepass \"${REDIS_PASSWORD:-default_redis_password}\""]
-    env_file: .env
+    command: ["sh", "-c", "redis-server --requirepass \"${SERVICE_PASSWORD_REDIS}\""]
     volumes:
-      - redis_data:/data
+      - redis:/data
+    environment:
+      - REDIS_PASSWORD=${SERVICE_PASSWORD_REDIS}
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"${REDIS_PASSWORD:-default_redis_password}\" ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "redis-cli -h localhost -p 6379 -a $${REDIS_PASSWORD} ping"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
     deploy:
       resources:
         limits:
           memory: 256M
 
 volumes:
-  storage_data:
-  postgres_data:
-  redis_data:
+  storage:
+  postgres:
+  redis:
