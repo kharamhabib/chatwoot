@@ -24,6 +24,7 @@ services:
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
       - FORCE_SSL=true
+      - FRONTEND_URL=${SERVICE_FQDN_RAILS:-http://localhost:3000}
       - DEFAULT_LOCALE=pt_BR
       - INTERNAL_HOST_URL=http://rails:3000
       - POSTGRES_HOST=postgres
@@ -58,6 +59,7 @@ services:
       - RAILS_ENV=production
       - INSTALLATION_ENV=docker
       - FORCE_SSL=true
+      - FRONTEND_URL=${SERVICE_FQDN_RAILS:-http://localhost:3000}
       - DEFAULT_LOCALE=pt_BR
       - INTERNAL_HOST_URL=http://rails:3000
       - POSTGRES_HOST=postgres
