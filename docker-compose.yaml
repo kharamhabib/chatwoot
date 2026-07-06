@@ -41,10 +41,7 @@ services:
     entrypoint: docker/entrypoints/rails.sh
     command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
     post_start:
-      - command: >
-          sh -c 'bundle exec rails db:chatwoot_prepare &&
-          (bundle exec rails branding:update || true) &&
-          (if [ -n "$${BRAND_ASSETS_URL}" ] && [ -f deployment/extract_brand_assets.sh ]; then deployment/extract_brand_assets.sh "$${BRAND_ASSETS_URL}"; fi)'
+      - command: ['bundle', 'exec', 'rails', 'db:chatwoot_prepare']
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- --header='Accept: text/html' --header='X-Forwarded-Proto: https' http://127.0.0.1:3000/ || exit 1"]
       interval: 60s
