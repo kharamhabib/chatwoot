@@ -38,6 +38,8 @@ services:
       - MAILER_SENDER_EMAIL=${MAILER_SENDER_EMAIL}
       - RESEND_API_KEY=${RESEND_API_KEY}
       - CHATWOOT_HUB_URL=https://chatwoot.rockconect.cloud/#
+      - DISPLAY_MANIFEST=false
+      - DISABLE_TELEMETRY=true
     entrypoint: docker/entrypoints/rails.sh
     command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
     post_start:
@@ -78,6 +80,8 @@ services:
       - MAILER_SENDER_EMAIL=${MAILER_SENDER_EMAIL}
       - RESEND_API_KEY=${RESEND_API_KEY}
       - CHATWOOT_HUB_URL=https://chatwoot.rockconect.cloud/#
+      - DISPLAY_MANIFEST=false
+      - DISABLE_TELEMETRY=true
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
     healthcheck:
       test: ["CMD-SHELL", "ps aux | grep [s]idekiq || exit 1"]
@@ -90,7 +94,7 @@ services:
           memory: 512M
 
   postgres:
-    image: ghcr.io/fazer-ai/postgres-16-pgvector:latest
+    image: ghcr.io/fazer-ai/postgres-16-pgvector:16
     restart: always
     volumes:
       - postgres:/var/lib/postgresql/data
@@ -110,7 +114,7 @@ services:
           memory: 512M
 
   redis:
-    image: redis:alpine
+    image: redis:7.2-alpine
     restart: always
     command: ["sh", "-c", "redis-server --requirepass \"${SERVICE_PASSWORD_REDIS}\""]
     volumes:
