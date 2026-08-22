@@ -121,6 +121,12 @@ Chatwoot now supports 1-Click deployment to DigitalOcean as a kubernetes app.
 
 For other supported options, checkout our [deployment page](https://chatwoot.com/deploy).
 
+## AI Feedback & Annotation (Agentation)
+
+Agentation visual feedback toolbar is supported for interactive UI inspection and real-time syncing with AI coding agents:
+- **Environment activation:** Set `ENABLE_AGENTATION=true` in your `.env` (with optional `AGENTATION_ENDPOINT`).
+- **On-demand activation in browser:** Add `?agentation=true` to the URL or execute `window.AgentationManager.enable()` in the browser developer console.
+
 ## Security
 
 Looking to report a vulnerability? Please refer our [SECURITY.md](./SECURITY.md) file.

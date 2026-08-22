@@ -56,7 +56,9 @@
         enabledLanguages: <%= available_locales_with_name.to_json.html_safe %>,
         helpUrls: <%= feature_help_urls.to_json.html_safe %>,
         inboxEventsEnabled: '<%= ENV['ENABLE_INBOX_EVENTS'].present? %>',
-        selectedLocale: '<%= I18n.locale %>'
+        selectedLocale: '<%= I18n.locale %>',
+        enableAgentation: '<%= ENV['ENABLE_AGENTATION'].present? && ActiveModel::Type::Boolean.new.cast(ENV['ENABLE_AGENTATION']) %>',
+        agentationEndpoint: '<%= ENV.fetch('AGENTATION_ENDPOINT', '') %>'
       }
       window.globalConfig = <%= raw @global_config.to_json %>
       window.browserConfig = {
