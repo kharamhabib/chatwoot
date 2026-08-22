@@ -28,8 +28,8 @@ if [ -n "$STAGED_EN_INDEX" ]; then
 
     # Loop through all directories in locales folder
     for dir in app/javascript/dashboard/i18n/locale/*/; do
-        # Skip the 'en' directory since it's the source
-        if [ "$dir" != "app/javascript/dashboard/i18n/locale/en/" ]; then
+        # Skip if not a directory or if it's the 'en' source directory
+        if [ -d "$dir" ] && [ "$dir" != "app/javascript/dashboard/i18n/locale/en/" ]; then
             # Copy the file
             cp "$SOURCE_FILE" "$dir"
 
@@ -47,6 +47,3 @@ if [ -n "$STAGED_EN_INDEX" ]; then
         echo "No other locale folders found to sync to"
     fi
 fi
-
-sleep 1
-# exit 0

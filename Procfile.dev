@@ -1,4 +1,0 @@
-backend: bundle exec rails s -p 3000
-# https://github.com/mperham/sidekiq/issues/3090#issuecomment-389748695
-worker: bundle exec sidekiq -C config/sidekiq.yml
-vite: bundle exec vite dev

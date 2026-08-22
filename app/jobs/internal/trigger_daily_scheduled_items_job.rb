@@ -11,6 +11,7 @@ class Internal::TriggerDailyScheduledItemsJob < ApplicationJob
 
   def schedule_version_check
     return unless Rails.env.production?
+    return if ENV['DISABLE_TELEMETRY'].present? && ActiveModel::Type::Boolean.new.cast(ENV['DISABLE_TELEMETRY'])
 
     Internal::CheckNewVersionsJob.set(wait_until: version_check_run_at).perform_later
   end

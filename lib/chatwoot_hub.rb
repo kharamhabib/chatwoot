@@ -83,9 +83,11 @@ class ChatwootHub
   end
 
   def self.sync_with_hub
+    return if ENV['DISABLE_TELEMETRY'].present? && ActiveModel::Type::Boolean.new.cast(ENV['DISABLE_TELEMETRY'])
+
     begin
       info = instance_config
-      info = info.merge(instance_metrics) unless ENV['DISABLE_TELEMETRY']
+      info = info.merge(instance_metrics)
       response = RestClient.post(ping_url, info.to_json, { content_type: :json, accept: :json })
       parsed_response = JSON.parse(response)
     rescue *ExceptionList::REST_CLIENT_EXCEPTIONS => e
@@ -97,6 +99,8 @@ class ChatwootHub
   end
 
   def self.register_instance(company_name, owner_name, owner_email)
+    return if ENV['DISABLE_TELEMETRY'].present? && ActiveModel::Type::Boolean.new.cast(ENV['DISABLE_TELEMETRY'])
+
     info = { company_name: company_name, owner_name: owner_name, owner_email: owner_email, subscribed_to_mailers: true }
     RestClient.post(registration_url, info.merge(instance_config).to_json, { content_type: :json, accept: :json })
   rescue *ExceptionList::REST_CLIENT_EXCEPTIONS => e
@@ -119,7 +123,7 @@ class ChatwootHub
   end
 
   def self.emit_event(event_name, event_data)
-    return if ENV['DISABLE_TELEMETRY']
+    return if ENV['DISABLE_TELEMETRY'].present? && ActiveModel::Type::Boolean.new.cast(ENV['DISABLE_TELEMETRY'])
 
     info = { event_name: event_name, event_data: event_data }
     RestClient.post(events_url, info.merge(instance_config).to_json, { content_type: :json, accept: :json })
